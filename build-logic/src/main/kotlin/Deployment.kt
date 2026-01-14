@@ -2,7 +2,6 @@
 
 import groovy.lang.Closure
 import groovy.util.Node
-import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
@@ -10,12 +9,14 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.internal.PublicationInternal
+import org.gradle.api.publish.internal.metadata.ModuleMetadataSpec
 import org.gradle.api.publish.maven.MavenArtifact
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
+import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.internal.Try
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.closureOf
 import org.gradle.kotlin.dsl.maybeCreate
@@ -25,7 +26,8 @@ import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
-import java.io.File
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 
 /**
  * Configure deployment tasks and properties for a project using the provided [deployConfig].
@@ -146,8 +148,24 @@ private fun Project.configureAndroidDeployment(
     }
 
     // Disable main publication
-    tasks.withType<AbstractPublishToMaven>().configureEach {
+    tasks.withType<AbstractPublishToMaven> {
         isEnabled = "Main" !in name
+    }
+
+    // Hook into Gradle module metadata generation
+    // and replace project references (e.g. "core") with the correct
+    // Maven dependency coordinates ("android-test-core")
+    tasks.withType<GenerateModuleMetadata> {
+        val junit = SupportedJUnit.values()
+            .firstOrNull { name.contains(it.variant, ignoreCase = true) }
+
+        if (junit != null) {
+            val modifier = ReflectiveModuleMetadataModifier(this, junit)
+
+            doFirst {
+                modifier.run()
+            }
+        }
     }
 }
 
@@ -461,6 +479,71 @@ private fun Project.centralPublishing(
                         delegate,
                         uri("https://central.sonatype.com/repository/maven-snapshots/")
                     )
+            }
+        }
+    }
+}
+
+/**
+ * Gradle module metadata modifier, replacing references to instrumentation libraries
+ * with the correct artifact ID in each module's JSON file (build/publications/.../module.json).
+ */
+private class ReflectiveModuleMetadataModifier(
+    private val task: GenerateModuleMetadata,
+    private val junit: SupportedJUnit
+) {
+    @Suppress("UNCHECKED_CAST")
+    private companion object {
+        private val reflectiveMethodCache = mutableMapOf<Class<*>, MutableMap<String, Method>>()
+        private val reflectiveFieldCache = mutableMapOf<Class<*>, MutableMap<String, Field>>()
+
+        fun <R : Any> method(cls: Class<*>, named: String, receiver: Any, vararg args: Any): R {
+            val methods = reflectiveMethodCache.getOrPut(cls, ::mutableMapOf)
+            val method = methods.getOrPut(named) {
+                cls.getDeclaredMethod(named).also { it.isAccessible = true }
+            }
+            return method.invoke(receiver, *args) as R
+        }
+
+        fun field(cls: Class<*>, named: String): Field {
+            val fields = reflectiveFieldCache.getOrPut(cls, ::mutableMapOf)
+            val field = fields.getOrPut(named) {
+                cls.getDeclaredField(named).also { it.isAccessible = true }
+            }
+            return field
+        }
+
+        fun <R : Any> Any.field(named: String): R = field(this.javaClass, named).get(this) as R
+    }
+
+    fun run() {
+        // Access the inputs of the task, then crawl through to the dependencies
+        // of each variant inside its module metadata. Rewrite the coordinates of each
+        // instrumentation lib found inside there.
+        val inputState = method<Any>(GenerateModuleMetadata::class.java, "inputState", task)
+        val metadataSpecTry = inputState.field<Try<ModuleMetadataSpec>>("moduleMetadataSpec")
+        val metadataSpec = metadataSpecTry.get()
+        val variants = metadataSpec.field<List<Any>>("variants")
+
+        for (variant in variants) {
+            val variantDependencies =
+                runCatching { variant.field<List<Any>>("dependencies") }
+                    .getOrNull()
+                    ?: continue
+
+            for (variantDependency in variantDependencies) {
+                val depCoordinates = variantDependency.field<Any>("coordinates")
+                val depGroup = depCoordinates.field<String>("group")
+                val depName = depCoordinates.field<String>("name")
+
+                if (depGroup == Artifacts.Instrumentation.groupId) {
+                    Artifacts.from(depName)?.let { replacement ->
+                        field(depCoordinates.javaClass, "name").set(
+                            depCoordinates,
+                            suffixedArtifactId(replacement.artifactId, junit)
+                        )
+                    }
+                }
             }
         }
     }

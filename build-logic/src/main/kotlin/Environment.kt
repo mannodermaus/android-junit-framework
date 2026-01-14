@@ -88,13 +88,14 @@ object Artifacts {
     const val LICENSE = "Apache-2.0"
 
     /**
-     * Retrieve the artifact configuration based on a Gradle project reference.
-     * Return null if none can be found
+     * Retrieve the artifact configuration based on a string name, or null if none can be found
      */
-    fun from(project: Project) =
-        when (project.name) {
+    fun from(name: String): Deployed? =
+        when (name) {
             "core" -> Instrumentation.Core
+            "extensions" -> Instrumentation.Extensions
             "runner" -> Instrumentation.Runner
+            "compose" -> Instrumentation.Compose
             "android-junit5" -> Plugin
             else -> null
         }
