@@ -32,7 +32,7 @@ Snapshots of the development version are available through [Sonatype's `snapshot
 ```kotlin
 plugins {
     // 1. Apply the plugin
-    id("de.mannodermaus.android-junit") version "2.0.0"
+    id("de.mannodermaus.android-junit") version "2.0.1"
 }
 
 dependencies {
@@ -134,7 +134,7 @@ when it sets up the artifacts automatically. However, it is possible to choose a
 
 ```kotlin
 junitPlatform {
-    instrumentationTests.version = "2.0.0"
+    instrumentationTests.version = "2.0.1"
 }
 ```
 
@@ -181,7 +181,7 @@ so please consider upgrading to at least AGP 8.2 before filing an issue with the
 
 |Your AGP Version|Suggested Plugin Version|
 |---|---|
-|`>= 8.2.0`|`2.0.0`|
+|`>= 8.2.0`|`2.0.1`|
 |`8.0.0` - `8.1.4`|`1.12.2.0`|
 |`7.0.0` - `7.4.2`|`1.10.0.0`|
 |`4.0.0` - `4.2.2`|`1.8.2.1`|
