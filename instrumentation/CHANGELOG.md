@@ -3,6 +3,10 @@ Change Log
 
 ## Unreleased
 
+## 2.0.1 (2026-01-14)
+
+- Fix incorrect Gradle Module Metadata for compose module, which declared an incorrect `core` dependency (#402, #403)
+
 ## 2.0.0 (2026-01-01)
 
 - Removed deprecated `runComposeTest` API from `ComposeExtension`
