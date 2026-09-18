@@ -30,7 +30,6 @@ dependencies {
     // since it can't provide any JUnit 5 runtime libraries itself
     // due to fear of prematurely incrementing the minSdkVersion requirement.
     runtimeOnly(libs.junit.platform.launcher)
-    runtimeOnly(libs.junit.platform.suiteapi)
     runtimeOnly(libs.junit.jupiter.engine)
 
     // This transitive dependency of JUnit 5 is required to be on the runtime classpath,

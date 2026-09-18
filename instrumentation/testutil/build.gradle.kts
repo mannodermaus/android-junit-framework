@@ -24,5 +24,4 @@ dependencies {
     api(libs.junit.jupiter.api)
     api(libs.junit.jupiter.params)
     api(libs.junit.platform.launcher)
-    api(libs.junit.platform.suiteapi)
 }

@@ -33,7 +33,6 @@ dependencies {
     compileOnly(libs.junit.jupiter.api)
     compileOnly(libs.junit.jupiter.params)
     compileOnly(libs.junit.platform.launcher)
-    compileOnly(libs.junit.platform.suiteapi)
 
     testImplementation(project(":testutil"))
     testImplementation(libs.robolectric)
