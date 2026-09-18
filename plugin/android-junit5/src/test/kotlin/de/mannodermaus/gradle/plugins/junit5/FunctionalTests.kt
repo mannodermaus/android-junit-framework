@@ -3,26 +3,16 @@ package de.mannodermaus.gradle.plugins.junit5
 import com.google.common.truth.Truth.assertWithMessage
 import de.mannodermaus.gradle.plugins.junit5.annotations.DisabledOnCI
 import de.mannodermaus.gradle.plugins.junit5.internal.extensions.capitalized
-import de.mannodermaus.gradle.plugins.junit5.util.BuildResultSubject
-import de.mannodermaus.gradle.plugins.junit5.util.TestEnvironment
-import de.mannodermaus.gradle.plugins.junit5.util.TestedAgp
-import de.mannodermaus.gradle.plugins.junit5.util.TestedJUnit
-import de.mannodermaus.gradle.plugins.junit5.util.prettyPrint
+import de.mannodermaus.gradle.plugins.junit5.util.*
 import de.mannodermaus.gradle.plugins.junit5.util.projects.FunctionalTestProjectCreator
-import de.mannodermaus.gradle.plugins.junit5.util.withPrunedPluginClasspath
 import java.io.File
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.DynamicContainer.dynamicContainer
-import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest.dynamicTest
-import org.junit.jupiter.api.TestFactory
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.fail
 
 @TestInstance(PER_CLASS)
 @DisabledOnCI
@@ -78,7 +68,7 @@ class FunctionalTests {
                         "AGP ${agp.shortVersion}",
                         // Exercise each test project within the given environment
                         projectCreator.allSpecs.filterSpecs().map { spec ->
-                            dynamicTest("${spec.name} ($junit)") {
+                            dynamicTest("${spec.name} (${junit.fullVersion})") {
                                 // Required for visibility inside the IntelliJ logging console
                                 // (display names are still bugged in the IDE)
                                 println(
