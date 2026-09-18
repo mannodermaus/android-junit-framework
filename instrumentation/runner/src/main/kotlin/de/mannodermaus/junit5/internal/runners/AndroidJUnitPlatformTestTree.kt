@@ -5,14 +5,14 @@ package de.mannodermaus.junit5.internal.runners
 import android.annotation.SuppressLint
 import de.mannodermaus.junit5.internal.extensions.format
 import de.mannodermaus.junit5.internal.extensions.isDynamicTest
+import java.util.Optional
+import java.util.function.Predicate
 import org.junit.platform.engine.UniqueId
 import org.junit.platform.engine.support.descriptor.ClassSource
 import org.junit.platform.engine.support.descriptor.MethodSource
 import org.junit.platform.launcher.TestIdentifier
 import org.junit.platform.launcher.TestPlan
 import org.junit.runner.Description
-import java.util.Optional
-import java.util.function.Predicate
 
 /**
  * Required, public extension to allow access to package-private TestTree class. Furthermore,
@@ -125,8 +125,7 @@ internal class AndroidJUnitPlatformTestTree(
 
         return if (identifier.isTest || identifier.isDynamicTest) {
             Description.createTestDescription(
-                /* className = */
-                testPlan
+                /* className = */ testPlan
                     .getParent(identifier)
                     .map(nameExtractor)
                     .orElse("<unrooted>"),

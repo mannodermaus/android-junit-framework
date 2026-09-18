@@ -58,9 +58,6 @@ public open class AndroidJUnitFrameworkBuilder internal constructor() : RunnerBu
 
     @Throws(Throwable::class)
     override fun runnerForClass(testClass: Class<*>): Runner? {
-        // Ignore a bunch of classes in internal packages
-        if (testClass.isInIgnorablePackage) return null
-
         try {
             return if (junitFrameworkAvailable) {
                 tryCreateJUnitFrameworkRunner(testClass, params)
@@ -81,14 +78,6 @@ public open class AndroidJUnitFrameworkBuilder internal constructor() : RunnerBu
     }
 
     /* Private */
-
-    private val ignorablePackages =
-        setOf("java.", "javax.", "androidx.", "com.android.", "kotlin.", "kotlinx.")
-
-    private val Class<*>.isInIgnorablePackage: Boolean
-        get() {
-            return ignorablePackages.any { name.startsWith(it) }
-        }
 
     private fun JUnitFrameworkRunnerParams.registerEnvironmentVariables() {
         environmentVariables.forEach { (key, value) ->
