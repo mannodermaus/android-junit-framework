@@ -9,7 +9,7 @@ import com.android.builder.core.ComponentType.Companion.UNIT_TEST_SUFFIX
 import de.mannodermaus.Libraries
 import de.mannodermaus.Libraries.Instrumentation
 import de.mannodermaus.gradle.plugins.junit5.dsl.AndroidJUnitPlatformExtension
-import de.mannodermaus.gradle.plugins.junit5.internal.config.ANDROID_JUNIT5_RUNNER_BUILDER_CLASS
+import de.mannodermaus.gradle.plugins.junit5.internal.config.ANDROID_JUNIT_RUNNER_BUILDER_CLASS
 import de.mannodermaus.gradle.plugins.junit5.internal.config.EXTENSION_NAME
 import de.mannodermaus.gradle.plugins.junit5.internal.config.JUnitPlatformTaskConfig
 import de.mannodermaus.gradle.plugins.junit5.internal.config.PluginConfig
@@ -118,11 +118,11 @@ private fun AndroidJUnitPlatformExtension.prepareInstrumentationTests(
 
     // Attach the JUnit 5 RunnerBuilder to the list, unless it's already added
     val runnerBuilders = runnerArgs.getAsList("runnerBuilder")
-    if (ANDROID_JUNIT5_RUNNER_BUILDER_CLASS !in runnerBuilders) {
+    if (ANDROID_JUNIT_RUNNER_BUILDER_CLASS !in runnerBuilders) {
         runnerArgs["runnerBuilder"] =
             runnerBuilders
                 .toMutableList()
-                .also { it.add(ANDROID_JUNIT5_RUNNER_BUILDER_CLASS) }
+                .also { it.add(ANDROID_JUNIT_RUNNER_BUILDER_CLASS) }
                 .joinToString(",")
     }
 
@@ -141,6 +141,8 @@ private fun AndroidJUnitPlatformExtension.prepareInstrumentationTests(
 }
 
 private fun MutableMap<String, String>.addConfigurationParameters(values: Map<String, String>) {
+    if (values.isEmpty()) return
+
     val instrumentationParams = this.getAsList("configurationParameters").toMutableList()
     values.forEach { (key, value) -> instrumentationParams.add("$key=$value") }
     this["configurationParameters"] = instrumentationParams.joinToString(",")

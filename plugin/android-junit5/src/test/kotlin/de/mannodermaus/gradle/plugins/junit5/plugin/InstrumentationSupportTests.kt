@@ -7,7 +7,7 @@ import de.mannodermaus.Libraries.JUnit.JUnit5
 import de.mannodermaus.gradle.plugins.junit5.dsl.UnsupportedDeviceBehavior
 import de.mannodermaus.gradle.plugins.junit5.extensions.android
 import de.mannodermaus.gradle.plugins.junit5.internal.artifact
-import de.mannodermaus.gradle.plugins.junit5.internal.config.ANDROID_JUNIT5_RUNNER_BUILDER_CLASS
+import de.mannodermaus.gradle.plugins.junit5.internal.config.ANDROID_JUNIT_RUNNER_BUILDER_CLASS
 import de.mannodermaus.gradle.plugins.junit5.internal.extensions.junitPlatform
 import de.mannodermaus.gradle.plugins.junit5.util.assertThat
 import de.mannodermaus.gradle.plugins.junit5.util.evaluate
@@ -40,7 +40,7 @@ internal class InstrumentationSupportTests {
         assertThat(
                 project.android.defaultConfig.testInstrumentationRunnerArguments["runnerBuilder"]
             )
-            .isEqualTo(ANDROID_JUNIT5_RUNNER_BUILDER_CLASS)
+            .isEqualTo(ANDROID_JUNIT_RUNNER_BUILDER_CLASS)
     }
 
     @Test
@@ -53,7 +53,7 @@ internal class InstrumentationSupportTests {
         assertThat(
                 project.android.defaultConfig.testInstrumentationRunnerArguments["runnerBuilder"]
             )
-            .isEqualTo("something.else,$ANDROID_JUNIT5_RUNNER_BUILDER_CLASS")
+            .isEqualTo("something.else,$ANDROID_JUNIT_RUNNER_BUILDER_CLASS")
     }
 
     @Test
