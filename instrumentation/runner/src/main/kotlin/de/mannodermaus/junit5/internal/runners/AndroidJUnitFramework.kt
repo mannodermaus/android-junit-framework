@@ -1,7 +1,9 @@
 package de.mannodermaus.junit5.internal.runners
 
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import de.mannodermaus.junit5.internal.LOG_TAG
 import de.mannodermaus.junit5.internal.discovery.EmptyTestPlan
 import de.mannodermaus.junit5.internal.runners.notification.ParallelRunNotifier
 import org.junit.platform.commons.JUnitException
@@ -36,6 +38,7 @@ internal class AndroidJUnitFramework(
 
     override fun run(notifier: RunNotifier) {
         testTree?.let { tree ->
+            Log.v(LOG_TAG, "run($testClass)")
             launcher.execute(
                 tree.testPlan,
                 AndroidJUnitPlatformRunnerListener(tree, tree.createNotifier(notifier)),

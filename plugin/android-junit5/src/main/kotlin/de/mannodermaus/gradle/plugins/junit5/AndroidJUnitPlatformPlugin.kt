@@ -18,7 +18,7 @@ public class AndroidJUnitPlatformPlugin : Plugin<Project> {
             whenAndroidPluginAdded { plugin ->
                 PluginConfig.find(this, plugin)?.let { config ->
                     require(config.currentAgpVersion >= MIN_REQUIRED_AGP_VERSION) {
-                        "android-junit5 plugin requires Android Gradle Plugin $MIN_REQUIRED_AGP_VERSION or later"
+                        "android-junit plugin requires Android Gradle Plugin $MIN_REQUIRED_AGP_VERSION or later"
                     }
 
                     configureJUnitFramework(config)
