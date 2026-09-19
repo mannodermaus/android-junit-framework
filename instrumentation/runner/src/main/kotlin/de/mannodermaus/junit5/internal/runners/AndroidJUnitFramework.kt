@@ -7,6 +7,7 @@ import de.mannodermaus.junit5.internal.runners.notification.ParallelRunNotifier
 import org.junit.platform.commons.JUnitException
 import org.junit.platform.engine.discovery.MethodSelector
 import org.junit.platform.launcher.core.LauncherFactory
+import org.junit.runner.Description
 import org.junit.runner.Runner
 import org.junit.runner.notification.RunNotifier
 
@@ -20,22 +21,33 @@ internal class AndroidJUnitFramework(
     private val testClass: Class<*>,
     params: JUnitFrameworkRunnerParams,
 ) : Runner() {
-    private val launcher = LauncherFactory.create()
+    private companion object {
+        private val launcher = LauncherFactory.create()
+
+        // Fallback for irrelevant classes passed to JUnit 4's RunnerBuilder
+        // (no test tree will be created for those, avoiding any potentially dangerous
+        // runtime lookups that can cause issues like `mannodermaus/android-junit-framework/413`)
+        private val emptyDescription = Description.createSuiteDescription("<empty>")
+    }
+
     private val testTree by lazy { generateTestTree(params) }
 
-    override fun getDescription() = testTree.suiteDescription
+    override fun getDescription(): Description = testTree?.suiteDescription ?: emptyDescription
 
     override fun run(notifier: RunNotifier) {
-        // Finally, launch the test plan on the JUnit Platform
-        launcher.execute(
-            testTree.testPlan,
-            AndroidJUnitPlatformRunnerListener(testTree, createNotifier(notifier)),
-        )
+        testTree?.let { tree ->
+            launcher.execute(
+                tree.testPlan,
+                AndroidJUnitPlatformRunnerListener(tree, tree.createNotifier(notifier)),
+            )
+        }
     }
 
     /* Private */
 
-    private fun generateTestTree(params: JUnitFrameworkRunnerParams): AndroidJUnitPlatformTestTree {
+    private fun generateTestTree(
+        params: JUnitFrameworkRunnerParams
+    ): AndroidJUnitPlatformTestTree? {
         val selectors = params.createSelectors(testClass)
         val isIsolatedMethodRun = selectors.size == 1 && selectors.first() is MethodSelector
         val isUsingOrchestrator = params.isUsingOrchestrator
@@ -67,16 +79,20 @@ internal class AndroidJUnitFramework(
                 EmptyTestPlan
             }
 
-        return AndroidJUnitPlatformTestTree(
-            testPlan = testPlan,
-            testClass = testClass,
-            needLegacyFormat = isIsolatedMethodRun || isUsingOrchestrator,
-            isParallelExecutionEnabled = params.isParallelExecutionEnabled,
-        )
+        return if (testPlan.containsTests()) {
+            AndroidJUnitPlatformTestTree(
+                testPlan = testPlan,
+                testClass = testClass,
+                needLegacyFormat = isIsolatedMethodRun || isUsingOrchestrator,
+                isParallelExecutionEnabled = params.isParallelExecutionEnabled,
+            )
+        } else {
+            null
+        }
     }
 
-    private fun createNotifier(nextNotifier: RunNotifier) =
-        if (testTree.isParallelExecutionEnabled) {
+    private fun AndroidJUnitPlatformTestTree.createNotifier(nextNotifier: RunNotifier) =
+        if (isParallelExecutionEnabled) {
             // Wrap the default notifier with a special handler for parallel test execution
             ParallelRunNotifier(nextNotifier)
         } else {

@@ -2,6 +2,9 @@ import extensions.library
 import extensions.libs
 import org.gradle.api.Project
 
+private val applicableConfigurationNameRegex =
+    Regex("[a-z]+[A-Z][a-z]+((Android)|(Unit))Test[A-Z][a-z]+Classpath")
+
 private val instrumentationLibraryRegex =
     Regex("de\\.mannodermaus\\.junit5:android-test-([a-z0-9]+)(-.+)?:")
 
@@ -9,7 +12,9 @@ fun Project.replaceAndroidTestLibsWithLocalProjectDependencies() {
     val self = this
 
     configurations.all {
-        if ("DebugAndroidTestRuntimeClasspath" !in name) {
+        val configuration = this
+
+        if (!name.matches(applicableConfigurationNameRegex)) {
             return@all
         }
 
@@ -32,8 +37,9 @@ fun Project.replaceAndroidTestLibsWithLocalProjectDependencies() {
             dependencySubstitution.all {
                 instrumentationLibraryRegex.find(requested.toString())?.let { result ->
                     val replacement = project(":${result.groupValues[1]}")
-                    println(
-                        "In $self, replace androidTest dependency '$requested' with $replacement"
+                    logger.lifecycle(
+                        "$self will replace dependency on '$requested' " +
+                                "with $replacement in $configuration"
                     )
                     useTarget(replacement, "Use $replacement to substitute dependency '$requested'")
                 }

@@ -70,7 +70,6 @@ junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-junit-platform-suiteapi = { module = "org.junit.platform:junit-platform-suite-api" }
 junit-vintage-api = { module = "junit:junit", version.ref = "junit4" }
 junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine" }
 kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

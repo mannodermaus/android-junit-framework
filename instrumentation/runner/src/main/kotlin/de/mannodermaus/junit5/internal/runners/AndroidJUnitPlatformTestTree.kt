@@ -7,13 +7,11 @@ import de.mannodermaus.junit5.internal.extensions.format
 import de.mannodermaus.junit5.internal.extensions.isDynamicTest
 import java.util.Optional
 import java.util.function.Predicate
-import org.junit.platform.commons.util.AnnotationUtils
 import org.junit.platform.engine.UniqueId
 import org.junit.platform.engine.support.descriptor.ClassSource
 import org.junit.platform.engine.support.descriptor.MethodSource
 import org.junit.platform.launcher.TestIdentifier
 import org.junit.platform.launcher.TestPlan
-import org.junit.platform.suite.api.SuiteDisplayName
 import org.junit.runner.Description
 
 /**
@@ -82,17 +80,10 @@ internal class AndroidJUnitPlatformTestTree(
         return descriptions.getValue(identifier)
     }
 
-    private fun generateSuiteDescription(testPlan: TestPlan, testClass: Class<*>): Description {
-        return Description.createSuiteDescription(getSuiteDisplayName(testClass)).also {
+    private fun generateSuiteDescription(testPlan: TestPlan, testClass: Class<*>): Description =
+        Description.createSuiteDescription(testClass.name).also {
             buildDescriptionTree(it, testPlan)
         }
-    }
-
-    private fun getSuiteDisplayName(testClass: Class<*>): String =
-        AnnotationUtils.findAnnotation(testClass, SuiteDisplayName::class.java)
-            .map(SuiteDisplayName::value)
-            .filter(String::isNotBlank)
-            .orElse(testClass.name)
 
     private fun buildDescriptionTree(suiteDescription: Description, testPlan: TestPlan) {
         testPlan.roots.forEach { identifier ->
