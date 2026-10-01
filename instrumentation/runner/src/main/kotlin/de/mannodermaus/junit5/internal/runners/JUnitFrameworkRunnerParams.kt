@@ -18,9 +18,10 @@ internal data class JUnitFrameworkRunnerParams(
     val environmentVariables: Map<String, String> = emptyMap(),
     val systemProperties: Map<String, String> = emptyMap(),
     private val configurationParameters: Map<String, String> = emptyMap(),
+    private val junitSelectors: String? = null,
 ) {
     fun createSelectors(testClass: Class<*>): List<DiscoverySelector> {
-        return ParsedSelectors.fromBundle(testClass, arguments)
+        return ParsedSelectors.fromBundle(testClass, arguments, junitSelectors)
     }
 
     fun createDiscoveryRequest(selectors: List<DiscoverySelector>): LauncherDiscoveryRequest {
@@ -39,6 +40,10 @@ internal data class JUnitFrameworkRunnerParams(
 
     val isUsingOrchestrator: Boolean
         get() = arguments.getString("orchestratorService") != null
+
+    /** True when tests were selected through [ParsedSelectors.ARG_JUNIT_SELECTORS]. */
+    val hasExplicitSelectors: Boolean
+        get() = junitSelectors != null
 
     internal companion object {
         fun create(): JUnitFrameworkRunnerParams {
@@ -81,6 +86,7 @@ internal data class JUnitFrameworkRunnerParams(
                 environmentVariables = environmentVariables,
                 systemProperties = systemProperties,
                 configurationParameters = configurationParameters,
+                junitSelectors = arguments.getString(ParsedSelectors.ARG_JUNIT_SELECTORS),
             )
         }
     }

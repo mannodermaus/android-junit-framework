@@ -3,6 +3,8 @@ Change Log
 
 ## Unreleased
 
+- Add `junitSelectors` instrumentation argument to select several methods, `@Nested` methods or single invocations of parameterized/repeated tests in one run, without AndroidX's `class` filter discarding them
+
 ## 2.0.1 (2026-01-14)
 
 - Fix incorrect Gradle Module Metadata for compose module, which declared an incorrect `core` dependency (#402, #403)

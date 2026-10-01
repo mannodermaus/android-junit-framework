@@ -52,7 +52,17 @@ internal class AndroidJUnitFramework(
         params: JUnitFrameworkRunnerParams
     ): AndroidJUnitPlatformTestTree? {
         val selectors = params.createSelectors(testClass)
-        val isIsolatedMethodRun = selectors.size == 1 && selectors.first() is MethodSelector
+        if (selectors.isEmpty()) {
+            // Explicit selectors were given, but none of them apply to this class
+            return null
+        }
+
+        // Explicit selectors bypass AndroidX's method filter, so the legacy name format
+        // (which only exists to satisfy that filter) is not needed for them
+        val isIsolatedMethodRun =
+            !params.hasExplicitSelectors &&
+                selectors.size == 1 &&
+                selectors.first() is MethodSelector
         val isUsingOrchestrator = params.isUsingOrchestrator
         val request = params.createDiscoveryRequest(selectors)
 
