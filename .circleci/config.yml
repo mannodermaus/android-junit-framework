@@ -48,43 +48,33 @@ jobs:
             - ~/.gradle/caches
             - ~/.gradle/wrapper
       - run:
-          name: Store Google Service Account
-          command: echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
-      - run:
-          name: Authorize gcloud and set config defaults
+          name: Setup emulator.wtf
           command: |
-            sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            sudo gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            mkdir -p $HOME/bin && \
+              curl https://maven.emulator.wtf/releases/ew-cli -o $HOME/bin/ew-cli && \
+              chmod a+x $HOME/bin/ew-cli && \
+              export PATH="$PATH:$HOME/bin"
       - run:
           name: Test with Firebase Test Lab (JUnit 5)
           command: >
-            sudo gcloud firebase test android run \
-              --type instrumentation \
+            ew-cli \
               --app instrumentation/sample/build/outputs/apk/five/debug/sample-five-debug.apk \
               --test instrumentation/core/build/outputs/apk/androidTest/five/debug/core-five-debug-androidTest.apk \
               --environment-variables runnerBuilder=de.mannodermaus.junit5.AndroidJUnitFrameworkBuilder \
               --test-runner-class androidx.test.runner.AndroidJUnitRunner \
-              --device model=redfin,version=30,locale=en_US,orientation=portrait \
-              --device model=oriole,version=33,locale=en_US,orientation=portrait \
-              --results-bucket cloud-test-${GOOGLE_PROJECT_ID} \
+              --device model=Pixel7Atd,version=30 \
+              --device model=Pixel7Atd,version=33 \
               --timeout 15m
       - run:
           name: Test with Firebase Test Lab (JUnit 6)
           command: >
-            sudo gcloud firebase test android run \
-              --type instrumentation \
+            ew-cli \
               --app instrumentation/sample/build/outputs/apk/six/debug/sample-six-debug.apk \
               --test instrumentation/core/build/outputs/apk/androidTest/six/debug/core-six-debug-androidTest.apk \
               --environment-variables runnerBuilder=de.mannodermaus.junit5.AndroidJUnitFrameworkBuilder \
               --test-runner-class androidx.test.runner.AndroidJUnitRunner \
-              --device model=pa3q,version=35,locale=en_US,orientation=portrait \
-              --results-bucket cloud-test-${GOOGLE_PROJECT_ID} \
+              --device model=Pixel7Atd,version=35 \
               --timeout 15m
-      - run:
-          name: Install gsutil dependency and copy test results data
-          command: |
-            mkdir test-lab-results
-            sudo gsutil -m cp -r -U `sudo gsutil ls gs://cloud-test-${GOOGLE_PROJECT_ID} | tail -1` test-lab-results/ | true
       - persist_to_workspace:
           root: ~/root
           paths:
