@@ -105,8 +105,8 @@ object Artifacts {
             else -> null
         }
 
-    private const val CURRENT_VERSION = "2.0.2"
-    private const val LATEST_STABLE_VERSION = "2.0.1"
+    private const val CURRENT_VERSION = "2.0.3-SNAPSHOT"
+    private const val LATEST_STABLE_VERSION = "2.0.2"
 
     /**
      * Gradle Plugin artifact
