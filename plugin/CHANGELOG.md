@@ -3,6 +3,10 @@ Change Log
 
 ## Unreleased
 
+## 2.0.2 (2026-10-14)
+- Internal: Update RunnerBuilder reference to `AndroidJUnitFrameworkBuilder` and away from the deprecated value
+- CI: Migrate from Firebase Test Lab to emulator.wtf
+
 ## 2.0.1 (2026-01-14)
 - This release is identical to 2.0.0 in regard to the plugin, as it only resolves an issue with packaging of the associated instrumentation libraries
 

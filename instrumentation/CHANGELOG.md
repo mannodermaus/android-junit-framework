@@ -3,6 +3,11 @@ Change Log
 
 ## Unreleased
 
+## 2.0.2 (2026-10-14)
+
+- Feature: Rework instrumentation filtering (#414)
+- Fix: Avoid adding empty configParams map to prevent invalid runnerArgs ("invalid userId -2") (#415)
+
 ## 2.0.1 (2026-01-14)
 
 - Fix incorrect Gradle Module Metadata for compose module, which declared an incorrect `core` dependency (#402, #403)

@@ -105,6 +105,9 @@ object Artifacts {
             else -> null
         }
 
+    private const val CURRENT_VERSION = "2.0.2"
+    private const val LATEST_STABLE_VERSION = "2.0.1"
+
     /**
      * Gradle Plugin artifact
      */
@@ -112,8 +115,8 @@ object Artifacts {
         platform = Java,
         groupId = "de.mannodermaus.gradle.plugins",
         artifactId = "android-junit5",
-        currentVersion = "2.0.2-SNAPSHOT",
-        latestStableVersion = "2.0.1",
+        currentVersion = CURRENT_VERSION,
+        latestStableVersion = LATEST_STABLE_VERSION,
         description = "Unit Testing with the JUnit Framework for Android."
     )
 
@@ -122,15 +125,13 @@ object Artifacts {
      */
     object Instrumentation {
         const val groupId = "de.mannodermaus.junit5"
-        private const val currentVersion = "2.0.2-SNAPSHOT"
-        private const val latestStableVersion = "2.0.1"
 
         val Core = Deployed(
             platform = Android(minSdk = 19),
             groupId = groupId,
             artifactId = "android-test-core",
-            currentVersion = currentVersion,
-            latestStableVersion = latestStableVersion,
+            currentVersion = CURRENT_VERSION,
+            latestStableVersion = LATEST_STABLE_VERSION,
             description = "Extensions for instrumented Android tests with the JUnit Framework."
         )
 
@@ -138,8 +139,8 @@ object Artifacts {
             platform = Android(minSdk = 19),
             groupId = groupId,
             artifactId = "android-test-extensions",
-            currentVersion = currentVersion,
-            latestStableVersion = latestStableVersion,
+            currentVersion = CURRENT_VERSION,
+            latestStableVersion = LATEST_STABLE_VERSION,
             description = "Optional extensions for instrumented Android tests with the JUnit Framework."
         )
 
@@ -147,8 +148,8 @@ object Artifacts {
             platform = Android(minSdk = 19),
             groupId = groupId,
             artifactId = "android-test-runner",
-            currentVersion = currentVersion,
-            latestStableVersion = latestStableVersion,
+            currentVersion = CURRENT_VERSION,
+            latestStableVersion = LATEST_STABLE_VERSION,
             description = "Runner for integration of instrumented Android tests with the JUnit Framework."
         )
 
@@ -156,8 +157,8 @@ object Artifacts {
             platform = Android(minSdk = 23),
             groupId = groupId,
             artifactId = "android-test-compose",
-            currentVersion = currentVersion,
-            latestStableVersion = latestStableVersion,
+            currentVersion = CURRENT_VERSION,
+            latestStableVersion = LATEST_STABLE_VERSION,
             description = "Extensions for Jetpack Compose tests with the JUnit Framework."
         )
     }
