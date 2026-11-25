@@ -1,11 +1,11 @@
 package de.mannodermaus.gradle.plugins.junit5
 
+import com.google.common.truth.Truth.assertWithMessage
 import de.mannodermaus.gradle.plugins.junit5.annotations.DisabledOnCI
 import de.mannodermaus.gradle.plugins.junit5.util.TestEnvironment
 import de.mannodermaus.gradle.plugins.junit5.util.assertThat
 import de.mannodermaus.gradle.plugins.junit5.util.prettyPrint
 import de.mannodermaus.gradle.plugins.junit5.util.projects.FunctionalTestProjectCreator
-import de.mannodermaus.gradle.plugins.junit5.util.splitToArray
 import de.mannodermaus.gradle.plugins.junit5.util.withPrunedPluginClasspath
 import java.io.File
 import org.gradle.testkit.runner.BuildResult
@@ -34,7 +34,7 @@ class ConfigurationCacheTests {
 
         // Ensure that no ADB device is connected before starting these tests,
         // as they have a certain expectation of "no device connected" for asserting their output
-        Runtime.getRuntime().exec("adb disconnect".splitToArray(" "))
+        ensureNoAdbDeviceConnected()
     }
 
     @TestFactory
@@ -75,6 +75,17 @@ class ConfigurationCacheTests {
         }
 
     /* Private */
+
+    private fun ensureNoAdbDeviceConnected() {
+        val process = ProcessBuilder("adb", "devices").start()
+        val output = process.inputStream.bufferedReader().use { it.lines().toList() }
+
+        assertWithMessage(
+                "This test requires no ADB device to be connected; disconnect all and retry."
+            )
+            .that(output)
+            .containsExactly("List of devices attached", "")
+    }
 
     private fun runGradle(project: File, task: String, expectSuccess: Boolean) =
         GradleRunner.create()
